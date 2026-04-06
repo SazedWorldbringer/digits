@@ -41,3 +41,38 @@ class Network:
         # output: (10, batch_size), Y: (batch_size, 10)
         output = output.T  # -> (batch_size, 10)
         return -np.mean(np.sum(Y*np.log(output + 1e-8), axis=1))
+
+    def backprop(self, X, Y):
+        # X: (batch, 784) Y: (batch, 10)
+        batch_size = X.shape[0]
+
+        # forward pass to get all zs and activations
+        _, zs, activations = self.forward(X)
+
+        # initialize empty gradient lists, one per layer
+        grad_w = [np.zeros_like(w) for w in self.weights]
+        grad_b = [np.zeros_like(b) for b in self.biases]
+
+        # output layer error
+        # activations[-1] is shape (10, batch), Y.T is (10, batch)
+        delta = activations[-1] - Y.T
+
+        # gradient for last layer's weights and biases
+        grad_w[-1] = (delta @ activations[-2].T) / batch_size
+        grad_b[-1] = delta.mean(axis=1, keepdims=True)
+
+        # propagate backwards through hidden layers
+        for l in range(2, self.num_layers):
+            z = zs[-l]  # pre activation at this layer
+            sp = sigmoid_prime(z)  # how sensitive was sigmoid here?
+            delta = (self.weights[-l+1].T @ delta) * sp  # pull error back
+
+            grad_w[-1] = (delta @ activations[-l-1].T) / batch_size
+            grad_b[-1] = delta.mean(axis=1, keepdims=True)
+
+        return grad_w, grad_b
+
+    def update(self, grad_w, grad_b, lr=0.01):
+        # nudge every weight opposite to its gradient
+        self.weights = [w - lr * gw for w, gw in zip(self.weights, grad_w)]
+        self.biases = [b - lr * gb for b, gb in zip(self.biases, grad_b)]
