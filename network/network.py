@@ -67,8 +67,8 @@ class Network:
             sp = sigmoid_prime(z)  # how sensitive was sigmoid here?
             delta = (self.weights[-l+1].T @ delta) * sp  # pull error back
 
-            grad_w[-1] = (delta @ activations[-l-1].T) / batch_size
-            grad_b[-1] = delta.mean(axis=1, keepdims=True)
+            grad_w[-l] = (delta @ activations[-l-1].T) / batch_size
+            grad_b[-l] = delta.mean(axis=1, keepdims=True)
 
         return grad_w, grad_b
 
