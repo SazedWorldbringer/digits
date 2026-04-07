@@ -1,12 +1,9 @@
 import numpy as np
-# from network.activations import sigmoid, sigmoid_prime, softmax
 from data.loader import load_mnist
 from network.train import train
 import matplotlib.pyplot as plt
 
 X_train, Y_train, y_train, X_test, Y_test, y_test = load_mnist()
-# net = train(X_train, Y_train, Y_train, X_test, Y_test, y_test,
-#             sizes=[784, 128, 10], epochs=10, batch_size=32, lr=0.01)
 net = train(X_train, Y_train, y_train, X_test, Y_test, y_test,
             sizes=[784, 128, 10], epochs=10, batch_size=32, lr=0.01)
 
